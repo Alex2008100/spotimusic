@@ -5,7 +5,7 @@ import random
 import pygame
 
 #Class for work with songs
-class Song:
+class Song_f:
     #Song controls
     def back():
         Song.select_song(-1)
@@ -18,6 +18,9 @@ class Song:
             pygame.mixer.music.load(song)
             pygame.mixer.music.play(loops = 0)
             play_btn['text'] = 'Stop'
+
+            update_history(song_list.get(ACTIVE))
+
             print('Play ' + song)
         #If the music was playing
         else:
@@ -56,7 +59,40 @@ class Song:
             song_list.activate(next)
             song_list.selection_set(next, last = None)
 
+    def add_song(bpm, genre, age):
+        pass
+
+    def update_history(title):
+        if not title in history:
+            history[title] = {
+            'bpm' : active_playlist['songs'][title]['bpm'],
+            'genre' : active_playlist['songs'][title]['genre'],
+            'age' : active_playlist['songs'][title]['age'],
+            'counter' : 0
+            }
+        history[title]['counter'] += 1
+
+        for parameter in active_playlist['songs'][title]:
+        if not history[title]['genre'] in counter:
+            counter['genre'][history[title]['genre']] = 1
+        else:
+            counter['genre'][history[title]['genre']] += 1
+
+        if not history[title]['bpm'] in counter:
+            counter['bpm'][history[title]['bpm']] = 1
+        else:
+            counter['bpm'][history[title]['bpm']] += 1
+
+        if not history[title]['age'] in counter:
+            counter['age'][history[title]['age']] = 1
+        else:
+            counter['age'][history[title]['age']] += 1
+
+        print(history)
+        print(counter)
+
     #Playlists controls
+
     #Selects playlist if exists,
     #or creates new one and saves it
     def select_playlist(title):
@@ -68,7 +104,7 @@ class Song:
             active_playlist = playlists[title]
         else:
             #Create and save
-            new_playlist = {'songs' : [], 'name': title}
+            new_playlist = {'songs' : {}, 'name': title}
             active_playlist = new_playlist
             playlists[title] = new_playlist
             #Add to menu
@@ -83,6 +119,39 @@ class Song:
         print('Shuffled playlist ' + active_playlist['name'])
         update_list()
 
+class History:
+    bpm = {}
+    genre = {}
+    age = {}
+    counter = {}
+
+    #Getters
+    def get_bpm(title):
+        return bpm[title]
+
+    def get_genre(title):
+        return genre[title]
+
+    def get_age(title):
+        return age[title]
+
+    def get_counter(title):
+        return counter[title]
+
+    #Setters and updaters
+
+    #Append song variables listened to by the user
+    #Activated when the song
+    def append(title, bpm, genre, age):
+        bpm[title] = bpm
+        genre[title] = genre
+        age[title] = age
+        counter['bpm'][bpm] = 0
+        counter['genre'][genre] = 0
+        counter['age'][age] = 0
+
+    def
+
 #Class for menu functions
 class Menu_f:
     def add_song():
@@ -93,8 +162,23 @@ class Menu_f:
         #Clean up the name for list
         song = song.replace('/home/alex/Project/spotimusic/songs/', '')
         song = song.replace('.mp3', '')
+
+        #Pop up window for parameters
+        pop_up = Tk()
+        pop_up.title('Set parameters')
+        pop_up.geometry('500x300')
+
+        bpm_entry = Entry()
+        genre_entry = Entry()
+        age_entry = Entry()
+
+        bpm_entry.pack()
+        genre_entry.pack()
+        age_entry.pack()
+
+        submit_btn = Button(text = 'Submit song', command = lambda:Song.add_song(bpm_entry.get(), genre_entry.get(), age_entry.get()))
         #Add to playlist
-        active_playlist['songs'].append(song)
+        active_playlist['songs'][song] = {'name': song, 'bpm': 0, 'genre': 'blah', 'age' : 2008}
 
         #Update and debug
         update_list()
@@ -136,7 +220,7 @@ window.geometry("300x500")
 pygame.mixer.init()
 
 playlists = {}
-playlists['base'] = {'songs' : [], 'name': 'base'}
+playlists['base'] = {'songs' : {}, 'name': 'base'}
 
 active_playlist = playlists['base']
 #List init
@@ -146,6 +230,9 @@ song_list = Listbox(window,
     width = 50, height = 33)
 song_list.pack()
 update_list()
+
+history = {}
+counter = {'genre': {}, 'bpm': {}, 'age': {}}
 
 #Controls init
 controls_frame = Frame(window)
