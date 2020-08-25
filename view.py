@@ -5,11 +5,6 @@ from playlist import Playlist
 from history import History
 import pygame
 
-artist = {}
-genre = {}
-bpm = {}
-age = {}
-
 class Player:
 
     #Parameters
@@ -18,6 +13,9 @@ class Player:
         self.playlists = {'base': self.active_playlist}
         self.history = History()
 
+    #Functions
+
+    #Play or stop toggle function
     def toggle_song(self, title):
         #If wasn't playing
         if self.play_btn['text'] != 'Stop':
@@ -31,17 +29,20 @@ class Player:
 
                     self.history.counter.add_all(self.active_playlist.songs[iter])
 
-                    print(self.history.counter.get_favourite())
+                    print(self.active_playlist.sort_by(self.history ,'artist'))
+                    self.favourites('artist')
 
                     self.play_btn['text'] = 'Stop'
 
         #If was playing
         else:
+            #Stop
             pygame.mixer.music.stop()
             self.play_btn['text'] = 'Play'
             #Reset pause button
             self.pause_btn['text'] = 'Pause'
 
+    #Pause or unpause toggle function
     def pause_song(self):
         #If unpaused
         if self.pause_btn['text'] == 'Pause':
@@ -52,17 +53,24 @@ class Player:
             pygame.mixer.music.unpause()
             self.pause_btn['text'] = 'Pause'
 
+    #Update song list box
     def update_list(self):
         self.song_list.delete(0, END)
         for song in self.active_playlist.songs:
             self.song_list.insert(END, song.title)
 
 
+    def favourites(self, parameter):
+        list = self.active_playlist.sort_by(self.history, parameter)
+        for song in self.active_playlist.songs:
+            if song.artist == list[0]:
+                print(song)
 
     #Menu functions
 
     #Add song
     def add_song(self):
+        #Get directory
         song_dir = filedialog.askopenfilename(
             initialdir = 'songs/',
             title = 'Choose a song',
@@ -117,9 +125,12 @@ class Player:
         title_entry = Entry(pop_up)
         title_entry.pack()
 
+        #Submit, add to dict and menu
         def submit(title):
             self.playlists[title] = Playlist(title, [])
             self.active_playlist = self.playlists[title]
+            #Add to menu
+            self.add_playlist_menu.add_command(label = title, command = lambda: self.select_playlist(title))
 
             self.update_list()
 
@@ -131,11 +142,20 @@ class Player:
 
         submit_btn.pack()
 
+    #Select playlists
+    def select_playlist(self, title):
+        if title in self.playlists:
+            self.active_playlist = self.playlists[title]
+            self.update_list()
+        else:
+            self.add_playlist()
+
     #Shuffle
     def shuffle(self):
         self.active_playlist.shuffle()
         self.update_list()
 
+    #UI init func, runs the programm
     def build_ui(self):
         #UI
 
@@ -180,7 +200,7 @@ class Player:
         self.menu.add_cascade(label = 'Playlist', menu = self.add_playlist_menu)
         self.add_playlist_menu.add_command(label = 'New playlist', command = lambda: self.add_playlist())
         self.add_playlist_menu.add_command(label = 'Shuffle', command = lambda: self.shuffle())
-        self.add_playlist_menu.add_command(label = 'base')
+        self.add_playlist_menu.add_command(label = 'base', command = lambda: self.select_playlist('base'))
         #Mainloop
         self.window.mainloop()
 

@@ -16,8 +16,8 @@ class History:
             self.bpm = {}
             self.age = {}
 
-        #Add 1 to each counter
-        #And adds objects if no such in dict
+        #Add 1 to each counter, or all at the same tiime
+        #adds objects if no such in dict
         def add_artist(self, artist):
             if not artist in self.artist:
                 self.artist[artist] = 0
@@ -43,7 +43,7 @@ class History:
 
             funcs = [self.add_artist, self.add_genre, self.add_bpm, self.add_age]
             params = [data['artist'], data['genre'], data['bpm'], data['age']]
-            [func(param) for func, param in zip(funcs, params)]
 
-        def get_favourite(self):
-            return {'artist': sorted(list(self.artist.values())), 'genre':  sorted(list(self.genre.values())), 'bpm':  sorted(list(self.bpm.values())), 'age':  sorted(list(self.age.values()))}
+            print(self.__dict__)
+
+            [func(param) for func, param in zip(funcs, params)]
