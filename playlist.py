@@ -18,25 +18,55 @@ class Playlist:
         Playlist.id += 1
         return Playlist.id
 
-
+    #Shuffle list of songs
     def shuffle(self):
         for i in range(len(self.songs)-1, 0, -1):
             j = random.randint(0, i)
             self.songs[j], self.songs[i] = self.songs[i], self.songs[j]
 
+    #Add songs
     def add_song(self, song):
         self.songs.append(song)
 
+    #Remove song by id
     def remove_song(self, song_id):
         for id in range(len(self.songs)-1):
             if self.songs[id].id is song_id:
                 self.songs.remove(self.songs[id])
 
-
+    #Return song based on id given
     def song_by_id(self, song_id):
         for id in range(len(self.songs)-1):
             if self.songs[id].id is song_id:
                 return self.songs[id]
 
+    #Returns dict with songs
+    #Title is key, id is value
     def songs_by_id(self):
-        return [song.id for song in self.songs]
+        songs = {}
+        for song in self.songs:
+            el = {song.title:song.id}
+            songs = {**songs, **el}
+
+        return songs
+
+    def sort_by(self, history ,parameter):
+        param = {'artist':history.counter.artist, 'genre':history.counter.genre, 'bpm':history.counter.bpm, 'age':history.counter.age}
+        dict = param[parameter]
+
+        list = []
+
+        for iter in range(len(dict)):
+            max = 0
+            max_key = ''
+            keys = dict.keys()
+            values = dict.values()
+            for key, value in dict.items():
+                print(key)
+                print(value)
+                if max < value:
+                    max = value
+                    max_key = key
+
+            list.append(max_key)
+        return list
