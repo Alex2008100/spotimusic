@@ -14,7 +14,7 @@ This is my original project for learning Python programming language and practic
 - [ ] Write my own music playback library
 
 ### Plans for repository:
-- [ ] Add gitignore file
+- [x] Add gitignore file
 - [ ] Add [Docker](https://www.docker.com/) support
 - [ ] Gather user feedback to define features to add
 
