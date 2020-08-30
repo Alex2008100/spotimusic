@@ -40,3 +40,4 @@ I'm not trying to keep a regular shcedule to update the project, but I'll be pro
 - Proper python project structure
 - Adding recommendations (optimisations needed)
 - Use of [magic functions](https://www.tutorialsteacher.com/python/magic-methods-in-python) for data classes
+- .gitignore file
