@@ -50,6 +50,20 @@ class Playlist:
 
         return songs
 
+    #Recommends songs based on 5 best parameters
+    def recommend(self, max_dict, parameter):
+        songs = []
+        for song in self.songs:
+            params = {'artist': song.artist, 'genre': song.genre, 'bpm': song.bpm, 'age': song.age}
+            param = params[parameter]
+            max_par = max_dict[parameter]
+            for key in sorted(max_par.keys(), reverse = True)[:5]:
+                if param in max_par[key]:
+                    songs.append(song)
+
+        return songs
+
+    #Sorting by some parameter (Not working!)
     def sort_by(self, history ,parameter):
         param = {'artist':history.counter.artist, 'genre':history.counter.genre, 'bpm':history.counter.bpm, 'age':history.counter.age}
         dict = param[parameter]
@@ -62,8 +76,6 @@ class Playlist:
             keys = dict.keys()
             values = dict.values()
             for key, value in dict.items():
-                print(key)
-                print(value)
                 if max < value:
                     max = value
                     max_key = key
