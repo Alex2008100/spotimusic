@@ -1,17 +1,19 @@
+#Libs
 from tkinter import filedialog
 from tkinter import *
-from song import Song
-from playlist import Playlist
-from history import History
+from .objects.song import Song
+from .objects.playlist import Playlist
+from .libs.base.counter import Counter
 import pygame
 
+#View
 class Player:
 
     #Parameters
     def set_parameters(self):
         self.active_playlist = Playlist('base', [])
         self.playlists = {'base': self.active_playlist}
-        self.history = History()
+        self.counter = Counter()
 
     #Functions
 
@@ -27,10 +29,8 @@ class Player:
                     pygame.mixer.music.load(self.active_playlist.songs[iter].dir)
                     pygame.mixer.music.play(loops = 0)
 
-                    self.history.counter.add_all(self.active_playlist.songs[iter])
-
-                    print(self.active_playlist.sort_by(self.history ,'artist'))
-                    self.favourites('artist')
+                    self.counter.add_all(self.active_playlist.songs[iter])
+                    self.counter.add_song(self.active_playlist.songs[iter])
 
                     self.play_btn['text'] = 'Stop'
 
@@ -41,6 +41,11 @@ class Player:
             self.play_btn['text'] = 'Play'
             #Reset pause button
             self.pause_btn['text'] = 'Pause'
+
+    def recommend(self):
+        self.playlists['Recommendations'] = Playlist('Recommendations', self.active_playlist.recommend(self.counter.max(), 'artist'))
+        self.active_playlist = self.playlists['Recommendations']
+        self.update_list()
 
     #Pause or unpause toggle function
     def pause_song(self):
@@ -61,7 +66,7 @@ class Player:
 
 
     def favourites(self, parameter):
-        list = self.active_playlist.sort_by(self.history, parameter)
+        list = self.active_playlist.sort_by(self.counter, parameter)
         for song in self.active_playlist.songs:
             if song.artist == list[0]:
                 print(song)
@@ -72,22 +77,20 @@ class Player:
     def add_song(self):
         #Get directory
         song_dir = filedialog.askopenfilename(
-            initialdir = 'songs/',
+            initialdir = '~/',
             title = 'Choose a song',
             filetypes = (('mp3 files', '*.mp3'),) )
-        #Clean up the name for list
-        title = song_dir
-        title = title.replace('/home/alex/Project/spotimusic/songs/', '')
-        title = title.replace('.mp3', '')
 
         #Pop up window for parameters
         pop_up = Tk()
         pop_up.title('Set parameters')
         pop_up.geometry('500x300')
+        title_entry = Entry(pop_up)
         artist_entry = Entry(pop_up)
         bpm_entry = Entry(pop_up)
         genre_entry = Entry(pop_up)
         age_entry = Entry(pop_up)
+        title_entry.pack()
         artist_entry.pack()
         bpm_entry.pack()
         genre_entry.pack()
@@ -105,7 +108,7 @@ class Player:
             pop_up,
             text = 'Submit song',
             command = lambda: submit(
-                title,
+                title_entry.get(),
                 artist_entry.get(),
                 genre_entry.get(),
                 song_dir,
@@ -156,7 +159,7 @@ class Player:
         self.update_list()
 
     #UI init func, runs the programm
-    def build_ui(self):
+    def start(self):
         #UI
 
         self.set_parameters()
@@ -200,9 +203,7 @@ class Player:
         self.menu.add_cascade(label = 'Playlist', menu = self.add_playlist_menu)
         self.add_playlist_menu.add_command(label = 'New playlist', command = lambda: self.add_playlist())
         self.add_playlist_menu.add_command(label = 'Shuffle', command = lambda: self.shuffle())
+        self.add_playlist_menu.add_command(label = 'Recommendations', command = lambda: self.recommend())
         self.add_playlist_menu.add_command(label = 'base', command = lambda: self.select_playlist('base'))
         #Mainloop
         self.window.mainloop()
-
-player = Player()
-player.build_ui()

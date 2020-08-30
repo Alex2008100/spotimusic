@@ -13,7 +13,7 @@ class Song:
         self.id = Song.get_id()
 
     def __str__(self):
-        return '{} {} {} {} {} {}'.format(self.id, self.title, self.artist, self.genre, self.bpm, self.age)
+        return '{}'.format(self.title)
 
     @staticmethod
     def get_id():
